@@ -22,27 +22,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const __dirname = path.resolve();
+// console.log(path.join(__dirname, "backend/uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
 // routers
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/upload", uploadRouter);
 
-if (process.env.NODE_ENV === "production") {
-  const __dirname = path.resolve();
-  app.use("/uploads", express.static("/var/data/uploads"));
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+app.get("*", (req, res) =>
+  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+);
 
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
-  );
-} else {
-  const __dirname = path.resolve();
-  app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
-  app.get("/", (req, res) => {
-    res.send("API is running....");
-  });
-}
+// if (process.env.NODE_ENV === "production") {
+//   const __dirname = path.resolve();
+//   app.use("/uploads", express.static("/var/data/uploads"));
+//   app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+//   app.get("*", (req, res) =>
+//     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+//   );
+// } else {
+//   const __dirname = path.resolve();
+//   app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+//   app.get("/", (req, res) => {
+//     res.send("API is running....");
+//   });
+// }
 
 // error handlers
 app.use(notFound);
